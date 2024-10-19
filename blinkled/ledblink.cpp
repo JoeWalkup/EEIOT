@@ -1,12 +1,12 @@
 #include "ledblink.h"
 
-LEDController::LEDController(int pin){
+LEDController::LEDController(int pin) {
     ledPin = pin;
     isOn = false;
     previousMillis = 0;
 }
 
-void LEDController::begin(){
+void LEDController::begin() {
     pinMode(ledPin, OUTPUT);
     turnOff();
 }
@@ -16,14 +16,16 @@ void LEDController::turnOn() {
     isOn = true;
 }
 
-void LEDController::turnOff() {
+void LEDController::turnOff(){
+    digitalWrite(ledPin, LOW);
     isOn = false;
 }
 
 void LEDController::toggle(){
-    if (isOn) {
+    if(isOn) {
         turnOff();
-    } else {
+    }
+    else {
         turnOn();
     }
 }
