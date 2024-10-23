@@ -99,7 +99,7 @@ void setup () {
 
 }
 void loop() {
-  if (digitalRead(BUTTON_PIN) == LOW) {
+  if (digitalRead(BUTTON_PIN) == HIGH) {
     Serial.println("button pressed");
     delay(150);
 
