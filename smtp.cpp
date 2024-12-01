@@ -21,16 +21,16 @@
 
 #define SMTP_HOST "smtp.gmail.com"
 #define SMTP_PORT 465
-#define AUTHOR_EMAIL "walkupj@sonoma.com"
-#define AUTHOR_PASSWORD "yrzh kiib ugxm vmdy"
-#define RECIPIENT_EMAIL "walkupj@sonoma.com"
+#define AUTHOR_EMAIL "walkupj@sonoma.edu"
+#define AUTHOR_PASSWORD "p"
+#define RECIPIENT_EMAIL "walkupj@sonoma.edu"
 
 void smtpCallback(SMTP_Status status);
 
 //Identity for user with password related to his realm (organization)
 //Available option of anonymous identity for federation of RADIUS servers or 1st Domain RADIUS servers
 #define EAP_IDENTITY "walkupj@solar.sonoma.edu" //nickname@example.com, at some organizations should work nickname only without realm, but it is not recommended
-#define EAP_PASSWORD "" //password for eduroam account
+#define EAP_PASSWORD "p" //password for eduroam account
 #define EAP_USERNAME "walkupj@solar.sonoma.edu" // the Username is the same as the Identity in most eduroam networks.
 
 //SSID NAME
@@ -86,6 +86,17 @@ void setup() {
   config.login.password = AUTHOR_PASSWORD;
   config.login.user_domain = "";
 
+/*
+  Set the NTP config time
+  For times east of the Prime Meridian use 0-12
+  For times west of the Prime Meridian add 12 to the offset.
+  Ex. American/Denver GMT would be -6. 6 + 12 = 18
+  See https://en.wikipedia.org/wiki/Time_zone for a list of the GMT/UTC timezone offsets
+  */
+  //config.time.ntp_server = F("pool.ntp.org,time.nist.gov");
+  //config.time.gmt_offset = 3;
+  //config.time.day_light_offset = 0;
+
   /* Declare the message class */
   SMTP_Message message;
 
@@ -136,7 +147,6 @@ void setup() {
 }
 
 void loop() {
-  Serial.println(WiFi.localIP());
   
 }
 
