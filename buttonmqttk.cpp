@@ -7,7 +7,7 @@ const char* password = "";
 
 // Add your MQTT Broker IP address, example:
 // const char* mqtt_server = "192.168.1.144";
-const char* mqtt_server = "130.157.111.115";
+const char* mqtt_server = "130.157.109.8";
 
 // Setup button pin
 const int buttonPin1 = 1;
