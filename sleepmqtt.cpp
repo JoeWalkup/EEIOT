@@ -17,7 +17,7 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 void setup_wifi();
-
+void reconnect();
 
           // Number of reboots
 void setup() {
