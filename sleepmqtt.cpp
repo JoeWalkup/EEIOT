@@ -9,7 +9,7 @@ const char* password = "";
 // const char* mqtt_server = "192.168.1.144";
 const char* mqtt_server = "130.157.110.196";
 
-int TIME_TO_SLEEP = 30;                        // Time ESP32 will go to sleep (in seconds)
+int TIME_TO_SLEEP = 5;                        // Time ESP32 will go to sleep (in seconds)
 unsigned long long uS_TO_S_FACTOR = 1000000;  // Conversion factor for microseconds to seconds
 RTC_DATA_ATTR int bootCount = 0;    
 
@@ -29,9 +29,7 @@ void setup() {
   /* Now we wrap up for Deep Sleep - I hope you did everything you needed to... */
   setup_wifi();
   client.setServer(mqtt_server, 1883);
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);  // Set up timer as the wake up source and set sleep duration to 5 seconds
-  esp_deep_sleep_start();   
-  
+    
   if (!client.connected()) {
     reconnect();
   }
@@ -43,6 +41,8 @@ void setup() {
     // Publish a message to the MQTT broker when the button is pressed
     client.publish("esp32/button", "sleep mode");
                                 // Start the deep sleep mode
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);  // Set up timer as the wake up source and set sleep duration to 5 seconds
+  esp_deep_sleep_start(); 
 }
 
 void setup_wifi() {
