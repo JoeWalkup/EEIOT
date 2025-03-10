@@ -1,0 +1,101 @@
+#include <WiFi.h>
+#include <PubSubClient.h>
+
+#include "esp_wpa2.h" //wpa2 library for connections to Enterprise networks
+
+//Identity for user with password related to his realm (organization)
+//Available option of anonymous identity for federation of RADIUS servers or 1st Domain RADIUS servers
+#define EAP_IDENTITY "walkupj@solar.sonoma.edu" //nickname@example.com, at some organizations should work nickname only without realm, but it is not recommended
+#define EAP_PASSWORD "..." //password for eduroam account
+#define EAP_USERNAME "walkupj@solar.sonoma.edu" // the Username is the same as the Identity in most eduroam networks.
+
+//SSID NAME
+const char* ssid = "eduroam"; // eduroam SSID
+
+
+// Add your MQTT Broker IP address, example:
+// const char* mqtt_server = "192.168.1.144";
+const char* mqtt_server = "130.157.110.196";
+
+int TIME_TO_SLEEP = 20;                        // Time ESP32 will go to sleep (in seconds)
+unsigned long long uS_TO_S_FACTOR = 1000000;  // Conversion factor for microseconds to seconds
+RTC_DATA_ATTR int bootCount = 0;    
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void reconnect();
+
+          // Number of reboots
+void setup() {
+  /****  Do your stuff here! ****/
+  Serial.begin(115200);                                 // Start serial communication at 115200 baud rate
+  ++bootCount;                                // Add 1 to the current value of bootCount
+  /* Now we wrap up for Deep Sleep - I hope you did everything you needed to... */
+  client.setServer(mqtt_server, 1883);
+    Serial.begin(115200);
+  delay(10);
+  Serial.print(F("Connecting to network: "));
+  Serial.println(ssid);
+  WiFi.disconnect(true);  //disconnect from WiFi to set new WiFi connection
+  //WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_ANONYMOUS_IDENTITY, EAP_IDENTITY, EAP_PASSWORD, test_root_ca); //with CERTIFICATE 
+  WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // without CERTIFICATE, RADIUS server EXCEPTION "for old devices" required
+
+  // Example: a cert-file WPA2 Enterprise with PEAP - client certificate and client key required
+  //WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD, test_root_ca, client_cert, client_key);
+
+  // Example: TLS with cert-files and no password - client certificate and client key required
+  //WiFi.begin(ssid, WPA2_AUTH_TLS, EAP_IDENTITY, NULL, NULL, test_root_ca, client_cert, client_key);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(F("."));
+  }
+  Serial.println("");
+  Serial.println(F("WiFi is connected!"));
+  Serial.println(F("IP address set: "));
+  Serial.println(WiFi.localIP()); //print LAN IP
+  
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+      // Button was just pressed
+    Serial.println("mqtt!");
+
+    // Publish a message to the MQTT broker when the button is pressed
+    client.publish("esp32/button", "sleep mode");
+                                // Start the deep sleep mode
+  Serial.println("Boot number: " + String(bootCount));  // print the value of bootCount on the serial monitor
+  Serial.println("Going to sleep now");                 // Print when the ESP is about to go into deep sleep mode
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);  // Set up timer as the wake up source and set sleep duration to 5 seconds
+  esp_deep_sleep_start(); 
+}
+
+void callback(char* topic, byte* message, unsigned int length) {
+  // This is where you can handle incoming messages if needed.
+  // For now, this is left empty.
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("ESP8266Client")) {
+      Serial.println("connected");
+      // Subscribe to topics if needed
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+void loop() {
+  // This is not going to be called
+  Serial.println("somethin smells");
+  delay(500);
+}
